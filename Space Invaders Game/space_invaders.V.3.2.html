@@ -1,0 +1,1550 @@
+
+<html>
+  <body>
+<canvas id="canvas" width="900" height="900" style="border:1px solid #000000"></canvas>
+
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var sqSize = 10;
+var xOffset = 95;
+var yOffset = 90;
+var speed = 10;
+var xStart = 20;
+var yStart = 150;
+var sec = 0; 
+var alienListLength = 24;
+var numOfALienCollided = 0;
+var alienList = [];
+ var tankerLifeArray = new Array(4);
+var tankerObj;
+var fireBullet = false;
+var blinkCounter = 0;
+var blinkCounter2 = 0
+    
+var moveDown = false;
+var moveLeft = false;
+var moveRight = true;
+var showScore = true;
+    
+var square1;
+var triangle1; 
+var square2; 
+var triangle2; 
+var square3;
+    
+//var audioo = new Audio('BulletSound.mp3');
+    var startscene = true;
+    var gamescene = false;
+var bgimg = new Image()
+bgimg.src = "bg.GIF";
+var logo = new Image()
+logo.src = "logo.png";
+    
+    var shootPic = new Image()
+shootPic.src = "pin2.png";
+     var spaceship = new Image()
+spaceship.src = "spaceship.png";
+
+
+var alienGrid1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,1,0,0,0,0,0,1,0,0,0,
+                 0,0,0,0,1,0,0,0,1,0,0,0,0,
+                 0,0,0,1,1,1,1,1,1,1,0,0,0,
+                 0,0,1,1,0,1,1,1,0,1,1,0,0,
+                 0,1,1,1,1,1,1,1,1,1,1,1,0,
+                 0,1,0,1,1,1,1,1,1,1,0,1,0,
+                 0,1,0,1,0,0,0,0,0,1,0,1,0,
+                 0,0,0,0,1,1,0,1,1,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+var alienGrid2 = [0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,1,0,0,0,0,0,1,0,0,0,
+                 0,0,0,0,1,0,0,0,1,0,0,0,0,
+                 0,1,0,1,1,1,1,1,1,1,0,1,0,
+                 0,1,0,1,0,1,1,1,0,1,0,1,0,
+                 0,1,1,1,1,1,1,1,1,1,1,1,0,
+                 0,0,0,1,1,1,1,1,1,1,0,0,0,
+                 0,0,0,1,0,0,0,0,0,1,0,0,0,
+                 0,0,1,0,0,0,0,0,0,0,1,0,0,
+                 0,1,0,0,0,0,0,0,0,0,0,1,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0];
+    
+var alienGrid3 = [0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,1,1,0,0,0,0,0,0,
+                 0,0,0,0,1,1,1,1,0,0,0,0,0,
+                 0,0,0,1,1,1,1,1,1,0,0,0,0, 
+                 0,0,1,1,0,1,1,0,1,1,0,0,0,
+                 0,1,1,1,1,1,1,1,1,1,1,0,0,
+                 0,1,1,1,1,1,1,1,1,1,1,0,0,
+                 0,1,0,0,1,0,0,1,0,0,1,0,0,
+                 0,1,0,1,0,0,0,0,1,0,1,0,0,
+                 0,0,0,0,1,0,0,1,0,0,0,0,0,
+                 0,0,0,1,0,0,0,0,1,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0];
+var alienGrid4 = [0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,1,1,0,0,0,0,0,0,
+                 0,0,0,0,1,1,1,1,0,0,0,0,0,
+                 0,0,0,1,1,1,1,1,1,0,0,0,0,
+                 0,0,1,1,0,1,1,0,1,1,0,0,0,
+                 0,1,1,1,1,1,1,1,1,1,1,0,0,
+                 0,1,1,0,0,0,0,0,0,1,1,0,0,
+                 0,1,1,1,1,1,1,1,1,1,1,0,0,
+                 0,1,0,0,1,0,0,1,0,0,1,0,0,
+                 0,0,0,0,1,0,0,1,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0 ];
+    
+var alienDestroyGrid= [0,1,0,0,1,0,0,0,1,0,0,1,0,
+                       0,0,1,0,0,1,0,1,0,0,1,0,0,
+                       0,0,0,1,0,1,0,1,0,1,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0,
+                       1,0,1,0,0,0,0,0,0,0,1,0,1,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0,
+                       0,0,0,1,0,1,0,1,0,1,0,0,0,
+                       0,0,1,0,0,1,0,1,0,0,1,0,0,
+                       0,1,0,0,1,0,0,0,1,0,0,1,0,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0];
+    
+var tankerDesign =[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,4,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,4,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,4,3,3,1,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,4,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,1,0,0,0,0,0,0,4,1,3,1,3,1,4,0,0,0,0,0,0,1,0,0,0,0,0,0,
+                   0,0,0,0,0,1,0,0,0,0,0,0,4,1,3,1,3,1,4,0,0,0,0,0,0,1,0,0,0,0,0,0,
+                   0,0,0,0,0,1,0,0,0,0,0,4,1,1,1,3,1,1,1,4,0,0,0,0,0,1,0,0,0,0,0,0,
+                   0,0,0,0,0,1,0,0,0,0,0,4,1,1,1,1,1,1,1,4,0,0,0,0,0,1,0,0,0,0,0,0,
+                   0,0,0,0,1,1,1,0,0,0,0,0,4,1,1,1,1,1,4,0,0,0,0,0,1,1,1,0,0,0,0,0,
+                   0,0,0,1,1,1,1,1,0,0,1,1,,4,1,1,1,1,4,1,1,0,0,1,1,1,1,1,1,0,0,0,
+                   0,0,1,1,1,1,1,1,0,0,1,1,1,1,4,1,1,4,1,1,1,0,0,1,1,1,1,1,1,1,0,0,
+                   0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,4,4,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,
+                   0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+                   0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,0,
+                   0,0,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,0,0,
+                   0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,0,
+                   0,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,
+                   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,
+                   0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
+                   0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
+                   0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
+                   0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+                   0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,0,
+                   0,1,1,1,1,0,0,0,1,1,1,1,0,0,,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,
+                   0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0];
+    
+    var squareStep1 =   [1,1,1,1,1,1,
+                        1,1,1,1,1,1,
+                        1,1,1,1,1,1,
+                        1,1,1,1,1,1,
+                        1,1,1,1,1,1,
+                        1,1,1,1,1,1];
+        
+    var squareStep2 =   [1,1,1,0,1,1,
+                        1,0,1,1,1,0,
+                        1,1,1,1,1,1,
+                        1,1,0,1,0,1,
+                        0,1,1,1,1,1,
+                        1,1,1,0,1,1];
+        
+    var squareStep3 =   [0,1,1,0,1,1,
+                        1,0,0,1,1,0,
+                        1,0,1,0,1,1,
+                        1,1,0,1,0,1,
+                        0,1,0,1,1,0,
+                        1,1,1,0,1,1];
+        
+    var squareStep4=   [0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0];
+    
+   
+    
+var triangle1Step1 = [0,0,0,0,0,1,
+                     0,0,0,0,1,1,
+                     0,0,0,1,1,1,
+                     0,0,1,1,1,1,
+                     0,1,1,1,1,1,
+                     1,1,1,1,1,1];
+        
+var triangle1Step2 =    [0,0,0,0,0,0,
+                        0,0,0,0,0,1,
+                        0,0,0,1,0,1,
+                        0,0,1,0,1,1,
+                        0,1,0,1,0,1,
+                        1,1,0,1,0,1];
+
+var triangle1Step3 =   [0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,1,0,
+                        0,0,1,0,0,1,
+                        0,1,0,0,0,1,
+                        1,0,1,0,0,1];
+        
+var triangle1Step4 =   [0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0];
+   
+var triangle2Step1 =   [1,0,0,0,0,0,
+                        1,1,0,0,0,0,
+                        1,1,1,0,0,0,
+                        1,1,1,1,0,0,
+                        1,1,1,1,1,0,
+                        1,1,1,1,1,1];
+
+var triangle2Step2  =  [0,0,0,0,0,0,
+                        1,0,0,0,0,0,
+                        1,0,1,0,0,0,
+                        1,1,0,1,0,0,
+                        1,0,1,0,1,0,
+                        1,0,1,0,1,1];
+
+var triangle2Step3  =  [0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,1,0,0,0,0,
+                        1,0,0,1,0,0,
+                        1,0,0,0,1,0,
+                        1,0,0,1,0,1];
+
+var triangle2Step4  =  [0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0,
+                        0,0,0,0,0,0];
+    
+var alienBulletDesign = [0,0,1,0,0,
+                         0,0,0,1,0,
+                         0,0,1,0,0,
+                         0,1,0,0,0,
+                         0,0,1,0,0];
+    
+    var tankerDestroyGrid = 
+                      /*[0,1,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,
+                       0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,
+                       0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,0,1,0,0,0,0,1,0,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,
+                       1,0,1,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,
+                       0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
+                       0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,
+                       0,1,0,0,1,0,0,0,1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,
+                       0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+                       0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+                       0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0];*/
+        
+                  [1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
+                   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                   0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,1,0,
+                   0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,
+                   0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,
+                   0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,
+                   0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
+                   0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,
+                   0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,
+                   0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
+                   0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,1,0,0,1,0,0,0,
+                   0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,
+                   0,0,0,1,0,0,0,0,1,0,0,0,1,0,1,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,
+                   1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,
+                   1,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,1,0,0,1,0,
+                   0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,
+                   0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,
+                   0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,
+                   0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,
+                   0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,
+                   0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,
+                   0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,
+                   0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
+                   0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,
+                   0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
+                   1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1]
+                       
+                   
+           
+function c_Aliens(xPos, yPos, size, color, alienGrid, row, column)
+{
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.size = size;
+    this.color = color;
+    this.xAxisDirection = 1;
+    this.row = row;
+    this.column = column;
+    this.alienGrid = alienGrid;
+    this.showAlienGrid1 = false;
+    this.showAlienGrid2 = false;
+    this.showAlienGrid3 = false;
+    this.collidedWithBulletBool = false;
+    this.showAlien = false;
+    this.showDestroyedGrid = false;
+    
+    this.initGrid = m_initGrid;
+    this.drawSq = m_drawSq;
+}
+
+function m_drawSq(x_Pos,y_Pos)
+{
+    ctx.fillStyle = this.color;
+    ctx.fillRect(x_Pos, y_Pos, this.size, this.size);
+}
+
+
+function m_initGrid()
+{
+    var xCounter = 0;
+    var yCounter = 0;
+
+    for(var i = 0; i < this.alienGrid.length; i ++)
+        {
+            xCounter++;
+            if(xCounter > this.column - 1)
+                {
+                    xCounter = 0;
+                    yCounter ++;
+                }
+                if(this.alienGrid[i] == 1)
+                    {
+                        this.drawSq(this.xPos + (this.size * xCounter),this.yPos + (this.size * yCounter));
+                    }
+        }
+}
+            
+function initAliens()
+{
+    var xCounter = 0, yCounter = 0;
+    for(var i = 0 ; i < alienListLength; i ++)
+        {
+            
+            alienList[i] = new c_Aliens(xStart+(xCounter * xOffset),yStart+(yCounter* yOffset),5,"white",alienGrid1,10,13);
+             alienList[i].showAlien = true;
+            xCounter++;
+            
+            if(xCounter % 8==0)
+                {
+                    xCounter = 0;
+                    yCounter++;
+                }
+            
+        }
+}
+    
+    var xyCounter = 0;
+function drawAliens()
+{
+    xyCounter++;
+    for(var i = 0 ; i < alienListLength; i ++)
+        {
+            if(alienList[i].showAlien == true)
+                {
+                    
+                     alienList[i].initGrid();
+                }
+            else if(alienList[i].showDestroyedGrid == true)
+                {
+                    alienList[i].alienGrid = alienDestroyGrid;
+                    alienList[i].initGrid();  
+                   
+                }
+            else
+                {
+                    alienList[i].alienGrid =[];
+                }
+             
+           
+        }   
+}
+
+function alienAnimator()
+{
+    
+    sec++;
+    if(sec%25==0)
+        {
+            moveAliens();
+        }
+ for(var i = 0 ; i < alienListLength; i ++)
+    {
+        if(sec % 30 == 0)
+            {
+                if(i >= 0 && i < 8)
+                {
+                   //alienList[i].showAlienGrid1 = true;
+                    alienList[i].alienGrid = alienGrid1; 
+                }
+                if(i >=8 && i < 16)
+                {
+                   //alienList[i].showAlienGrid2 = true;
+                    alienList[i].alienGrid = alienGrid2; 
+                }
+                if(i >=16 && i < 24)
+                {
+                   //alienList[i].showAlienGrid3 = true;
+                    alienList[i].alienGrid = alienGrid3; 
+                }
+        
+            }
+           
+            
+            
+        
+        if(sec % 60 == 0)
+        {
+            if(i >= 0 && i < 8)
+                {
+                   //alienList[i].showAlienGrid2 = true;
+                    alienList[i].alienGrid = alienGrid2; 
+                }
+                if(i >=8 && i < 16)
+                {
+                   //alienList[i].showAlienGrid1 = true;
+                    alienList[i].alienGrid = alienGrid1; 
+                }
+                if(i >=16 && i < 24)
+                {
+                   //alienList[i].showAlienGrid2 = true;
+                    alienList[i].alienGrid = alienGrid4; 
+                }
+            //sec = 0;
+        
+        }
+      
+
+    }
+    
+}
+
+function moveAliens()
+{
+    if(alienList[alienListLength-1].xPos +(alienList[alienListLength-1].size * alienList[alienListLength-1].column) < canvas.width - xStart && moveRight == true)
+        {
+            for(var i = 0 ; i < alienListLength; i ++)
+            {
+                alienList[i].xPos += speed;
+            }
+        }
+    else if( alienList[0].xPos > xStart && moveLeft == true)
+        {
+            for(var i = 0 ; i < alienListLength; i ++)
+            {
+                alienList[i].xPos -= speed;
+            }
+        }
+    else
+    {
+         moveDown = true;   
+    }
+    
+    if(moveDown == true)
+        {
+            moveDown = false;
+            
+            for(var i = 0 ; i < alienListLength; i ++)
+            {
+                    alienList[i].yPos += 3*speed;
+            }
+            
+            if(moveRight == true)
+            {
+                moveRight = false;
+                moveLeft = true;
+            }
+            else
+            {
+                moveRight = true;
+                moveLeft = false;
+            }
+        }
+}
+function destroyGrid()
+{
+    for(var i = 0 ; i < alienListLength; i ++)
+        {
+            if( alienList[i].showDestroyedGrid == true )
+                {
+                    alienList[i].alienGrid = [];
+                    alienList[i].showAlien = false;
+                    alienList[i].showDestroyedGrid = false;
+                }
+
+        }                               
+}
+function c_tanker(xCord, yCord, speed, size,tgrid,color)
+{
+    this.xCord = xCord;
+    this.yCord = yCord;
+    this.speed = speed;
+    this.size = size;
+    this.color = color;
+    this.tankerGrid = tgrid;
+    this.column = 32;
+    this.row = 30;
+    this.direction = 0;
+    this.life = 4;
+    this.collidedWithBullet = false;
+    this.showTanker = true;
+    this.showTankerDestroyedGrid = false;
+    this.initTanker =  m_initTankerGrid;
+    this.drawSq = m_drawEachSq;
+    this.moveTanker = m_moveTanker;
+
+}
+    
+function m_drawEachSq(x_Pos,y_Pos)
+{
+    ctx.fillStyle = this.color;
+    ctx.fillRect(x_Pos, y_Pos, this.size, this.size);
+}
+
+function m_initTankerGrid()
+{
+    var xCounter = 0;
+    var yCounter = 0;
+
+    for(var i = 0; i < this.tankerGrid.length; i ++)
+        {
+            xCounter++;
+            if(xCounter > this.column - 1)
+                {
+                    xCounter = 0;
+                    yCounter ++;
+                }
+            if(this.tankerGrid[i] == 1)
+                {
+                    this.drawSq(this.xCord + (this.size * xCounter),this.yCord + (this.size * yCounter));
+                }
+        }
+}
+function m_moveTanker()
+{
+    if( this.xCord + (this.size * this.column) + (this.direction * this.speed) < canvas.width && this.direction == 1)
+        {
+            this.xCord += (this.direction * this.speed);
+
+        }
+    if(this.xCord + (this.direction * this.speed) > 0 && this.direction == -1)
+        {
+            this.xCord += (this.direction * this.speed);
+        }
+}
+function initTanker()
+{
+    tankerObj = new c_tanker(500, canvas.height- (30*3), 5, 3, tankerDesign, "yellow");
+}
+
+function drawTanker()
+{
+    if(tankerObj.showTanker )
+        {
+            tankerObj.initTanker();
+            tankerObj.moveTanker();
+        }
+    
+}
+    function resetTanker()
+    {
+        tankerObj.xCord = 500;
+        tankerObj.yCord = canvas.height- (30*3);
+        tankerObj.showTanker = true;
+        tankerObj.tankerGrid = tankerDesign;
+        tankerObj.speed = 5;
+    tankerObj.size = 3;
+    tankerObj.color = "yellow";
+    tankerObj.column = 32;
+    tankerObj.row = 30;
+    tankerObj.direction = 0;
+    //this.life = 4;
+    tankerObj.collidedWithBullet = false;
+    tankerObj.showTanker = true;
+    tankerObj.showTankerDestroyedGrid = false;
+        //setTimeout(drawTanker, 1000);
+        drawTanker();
+    }
+  function c_bullet(bLength,bBreadth, bspeed, bcolor)
+    {
+        this.bxPos = 0;
+        this.byPos = 0;
+        this.bLength = bLength;
+        this.bBreadth = bBreadth;
+        this.bspeed = bspeed;
+        this.bcolor = bcolor;
+        this.showBullet = false;
+        this.drawBullet = m_drawBullet;
+        this.fire = m_fireBullet;
+        this.resetBullet = m_resetBullet;
+        
+    }
+        
+function m_drawBullet()
+    {
+        this.fire();
+        ctx.fillStyle = this.bcolor;
+        ctx.fillRect(this.bxPos ,this.byPos,this.bBreadth, this.bLength);
+    }
+    
+    function m_resetBullet()
+   {
+    this.bxPos = tankerObj.xCord + (tankerObj.size * tankerObj.column)/2-3;
+    this.byPos = tankerObj.yCord - 3 ;
+   }
+    
+    function m_fireBullet()
+{
+    if(this.showBullet)
+        {
+            this.byPos -= this.bspeed;
+        }
+    if(this.byPos < 0)
+        {
+            this.showBullet = false;
+        }    
+}
+    var numOfBullets = 30;
+    var bulletArray = new Array(numOfBullets);
+    var gap = 30;
+    
+function initBullet()
+    {
+        for(var i = 0 ; i < numOfBullets; i ++)
+            {
+                bulletArray[i] = new c_bullet( 10 , 4 , 8, "blue");
+            }
+    }
+     
+function drawBullet()
+    { 
+         for(var i = 0 ; i < numOfBullets; i ++)
+            {
+                if(bulletArray[i].showBullet)
+                    {
+                        bulletArray[i].drawBullet();
+                    } 
+            }
+        
+    }
+var keyPressed = false;
+function keyDownManager(e)
+{
+    keyPressed = true;
+   downManager(e);
+}
+    
+function downManager(e)
+{
+    if(e.keyCode == 32)
+        {
+            fireBullet = true; 
+            //audioo.play();
+            //document.getElementById('BulletSound').play();
+        }
+    if(e.keyCode == 37)
+        {
+            tankerObj.direction = -1;
+        }
+      if(e.keyCode == 39)
+        {
+            tankerObj.direction = 1;
+        }
+    /*if(e.keyCode == 13)
+        {
+            fireAlienBulletBool = true;  
+        }*/
+    if(e.keyCode == 13)
+        {
+            //gamescene
+           gamescene = true;
+           startscene = false; 
+        }
+}
+    
+function keyUpManager(e)
+{
+    keyPressed = false;
+    UpManager(e);
+}
+function UpManager(e)
+{
+    if(e.keyCode == 32)
+        {
+            fireBullet = false;
+        }
+    if(e.keyCode == 37)
+        {
+            tankerObj.direction = 0;
+        }
+    if(e.keyCode == 39)
+        {
+            tankerObj.direction = 0;
+        }
+    if(e.keyCode == 13)
+        {
+            //fireAlienBulletBool = false;  
+        }
+}
+    
+var fireCounter = 0;
+var bulletTimerCounter = 0;
+var bulletFireGap = 3;
+    
+function bulletManager()
+{
+    if(fireBullet == true && bulletTimerManager())
+    {
+        fireCounter++;
+        if(fireCounter == numOfBullets )
+        {
+            fireCounter = 0;
+        }
+        bulletArray[fireCounter].showBullet = true;
+        bulletArray[fireCounter].resetBullet();
+    } 
+        
+}
+
+function bulletTimerManager()
+{
+    bulletTimerCounter++;
+    
+    if(bulletTimerCounter == bulletFireGap)
+        {
+            bulletTimerCounter = 0;
+            return true;
+        }
+    else
+        {
+            return false;
+        }
+}
+
+
+function  collisionDetection()
+ {
+     for(var i = 0 ; i < numOfBullets; i ++)
+     {
+         for(var j = 0 ; j < alienListLength; j ++)
+         {
+          if(alienList[j].showAlien)
+              {
+                if(bulletArray[i].showBullet == true)
+                {
+                    if(bulletArray[i].byPos <= alienList[j].yPos + (alienList[j].size * alienList[j].row) && 
+                          bulletArray[i].byPos > alienList[j].yPos)
+                    {
+                       
+                        if(bulletArray[i].bxPos > alienList[j].xPos &&
+                           bulletArray[i].bxPos < alienList[j].xPos + (alienList[j].size * alienList[j].column) || 
+                          bulletArray[i].bxPos + bulletArray[i].bBreadth > alienList[j].xPos &&
+                           bulletArray[i].bxPos + bulletArray[i].bBreadth < alienList[j].xPos + (alienList[j].size * alienList[j].column))
+                            {
+                                numOfALienCollided ++;
+                                alienList[j].collidedWithBulletBool = true;
+                                 alienList[j].showAlien = false;
+                                alienList[j].showDestroyedGrid = true;
+                                bulletArray[i].showBullet = false;
+                                setTimeout(destroyGrid, 1000);
+                                if(numOfALienCollided == 24)
+                                    {
+                                        setTimeout(winningScene, 1000);
+                                    }
+                               
+                            }
+                        }
+                     }
+                  }
+              }
+              
+          }
+       
+  }
+    
+function c_Units(x,y, grid)
+    {
+        this.x = x; 
+        this.y = y ; 
+        this.grid = grid;
+        this.collideCounterSq = 0;
+        this.collideCounterTr1 = 0;
+        this.collideCounterTr2 =0;
+        this.rowSize = 6;
+        this.columnSize = 6;
+        this.size = 5;
+        this.color = "brown";
+        
+        this.drawEachSquare = m_drawEachSquare;
+        this.drawUnitGrid = m_drawUnitGrid;  
+    }
+    
+    function m_drawEachSquare(x_Pos, y_Pos)
+    {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(x_Pos, y_Pos, this.size, this.size);
+        
+    }    
+    
+    function m_drawUnitGrid()
+    {
+        var xCounter = 0;
+        var yCounter = 0;
+        
+        for(var i = 0 ; i < this.grid.length; i ++)
+        {
+            if(xCounter == this.columnSize )
+                {
+                    xCounter = 0;
+                    yCounter ++;
+                } 
+            if(this.grid[i] == 1)
+            {
+                
+                this.drawEachSquare(this.x +(this.size * xCounter), this.y + (this.size * yCounter));
+               
+            }
+            xCounter++;
+        }        
+    }
+    
+    
+    function c_Shields(x)
+    {
+        this.x = x;
+        this.y = 700;
+        this.triangle1 = new c_Units(this.x, this.y, triangle1Step1);
+        this.square1 = new c_Units(this.x, this.y + 30, squareStep1 );
+        this.square2 = new c_Units(this.x + 30, this.y , squareStep1 );
+        this.triangle2 = new c_Units(this.x + 60, this.y, triangle2Step1);
+        this.square3 = new c_Units(this.x + 60, this.y + 30 , squareStep1 );
+        this.body = [this.triangle1, this.square1, this.square2, this.triangle2, this.square3];
+    
+        
+        this.drawShields = m_drawShiels;
+    }
+    var shieldArray = new Array(4);
+    var shieldOffset = 50;
+    var shieldGap = 220;
+    
+    function m_drawShiels()
+    {
+        for(var i = 0 ; i < this.body.length; i++)
+            {
+                this.body[i].drawUnitGrid();
+            }
+    }
+    
+    function initshields()
+    {
+        for(var i = 0 ; i < shieldArray.length; i ++)
+            {
+                shieldArray[i] = new c_Shields(shieldOffset + (i * shieldGap));
+            }
+    }
+   function drawAllShields()
+    {
+        for(var i = 0 ; i < shieldArray.length; i ++)
+            {
+                shieldArray[i].drawShields();
+            }
+    }
+ var collideCounterSq = 0; 
+    var collideCounterTr1 = 0;
+    var collideCounterTr2 = 0;
+    
+function collision_With_Shield()
+{
+    for(var i = 0 ; i < numOfBullets; i ++)
+    {  
+        for(var j = 0 ; j < shieldArray.length; j ++)
+        {
+            for(var k = 0 ; k < shieldArray[j].body.length; k ++) 
+            {
+                if(bulletArray[i].showBullet && bulletArray[i].byPos <= shieldArray[j].body[k].y + 
+                  (shieldArray[j].body[k].size * shieldArray[j].body[k].rowSize)  && 
+                  bulletArray[i].byPos > shieldArray[j].body[k].y )
+                    {
+                        if(bulletArray[i].bxPos > shieldArray[j].body[k].x &&
+                        bulletArray[i].bxPos < shieldArray[j].body[k].x + (shieldArray[j].body[k].size * shieldArray[j].body[k].columnSize) || 
+                        bulletArray[i].bxPos + bulletArray[i].bBreadth > shieldArray[j].body[k].x &&
+                        bulletArray[i].bxPos + bulletArray[i].bBreadth < shieldArray[j].body[k].x + (shieldArray[j].body[k].size * shieldArray[j].body[k].columnSize))
+                            {
+                                if(shieldArray[j].body[k].grid == squareStep1 && shieldArray[j].body[k].collideCounterSq == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep2;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep2 && shieldArray[j].body[k].collideCounterSq == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep3;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep3 && shieldArray[j].body[k].collideCounterSq == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep4;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep4 && shieldArray[j].body[k].collideCounterSq == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                                shieldArray[j].body[k].collideCounterSq++;
+                                
+                                if(shieldArray[j].body[k].grid == triangle1Step1 && shieldArray[j].body[k].collideCounterTr1 == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step2;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step2 && shieldArray[j].body[k].collideCounterTr1 == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step3;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step3 && shieldArray[j].body[k].collideCounterTr1 == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step4;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step4 && shieldArray[j].body[k].collideCounterTr1 == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                               shieldArray[j].body[k].collideCounterTr1++;
+                                
+                                if(shieldArray[j].body[k].grid == triangle2Step1 && shieldArray[j].body[k].collideCounterTr2 == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step2;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step2 && shieldArray[j].body[k].collideCounterTr2 == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step3;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step3 && shieldArray[j].body[k].collideCounterTr2 == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step4;
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step4 && shieldArray[j].body[k].collideCounterTr2 == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      bulletArray[i].showBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                               shieldArray[j].body[k].collideCounterTr2++;
+                                
+                                
+                            }
+                    }
+                }
+            }
+    }
+}
+var bullPosX = 0;
+var bullPosY = 0;
+var generateCounter = 0;
+    var randomNumGen = 0;
+   function randomAlienSelector()
+    {
+        generateCounter++;
+         randomNumGen = Math.floor((Math.random() * (24 - 0 + 1)) + 0 );
+        for(var i = 0 ; i < alienListLength; i++)
+            {
+                if(generateCounter == 50 )
+                    {
+                        
+                        bullPosX = alienList[randomNumGen].xPos + (alienList[randomNumGen].size * alienList[randomNumGen].column)/2;
+                        bullPosY = alienList[randomNumGen].yPos + (alienList[randomNumGen].size * alienList[randomNumGen].row)/2; 
+                        generateCounter=0;
+                    }
+            }
+        
+    }
+   function c_AlienBullets( alienBulletGrid,color)
+    {
+        this.ax = alienList[randomNumGen].xPos + (alienList[randomNumGen].size * alienList[randomNumGen].column)/2;
+        this.ay = alienList[0].yPos + alienList[randomNumGen].yPos + (alienList[randomNumGen].size * alienList[randomNumGen].row) +2; ;
+        this.alienBulletGrid = alienBulletGrid;
+        this.color = color;
+        this.size = 4;
+        this.aspeed = 0.4;
+        this.column = 5;
+        this.row = 5;
+        this.showAlienBullet = false;                     
+        
+        
+        this.drawAlienBulletSq = m_drawAlienBulletSq;
+        this.initAlienBulletGrid = m_initAlienBulletGrid;
+        this.resetAleinBullet= m_resetAlienBullet;
+        this.fireAlienBullet = m_fireAlienBullet;
+        
+    }
+    
+    var alienBulletArray = [24];
+    var totalNumOfBullets = 24;
+    var fireAlienBulletBool = false;
+    
+    function m_drawAlienBulletSq(x_Pos, y_Pos)
+    {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(x_Pos, y_Pos, this.size, this.size);
+    }
+    
+    function m_initAlienBulletGrid()
+    {
+        var xCounter = 0;
+        var yCounter = 0;
+        
+        for(var i = 0 ; i < this.alienBulletGrid.length; i ++)
+        {
+            if(xCounter == this.column )
+                {
+                    xCounter = 0;
+                    yCounter ++;
+                } 
+            if(this.alienBulletGrid[i] == 1)
+            {
+                
+                this.drawAlienBulletSq(this.ax +(this.size * xCounter), this.ay + (this.size * yCounter));
+               
+            }
+            xCounter++;
+        }        
+    }
+    
+     function m_resetAlienBullet()
+   {
+       //for(var i = 0 ; i < alienListLength; i ++)
+           {   
+               randomNumGen = Math.floor((Math.random() * (23 - 0 + 1)) + 0 );
+                this.ax = alienList[randomNumGen].xPos + (alienList[randomNumGen].size * alienList[randomNumGen].column)/2;
+                this.ay = alienList[randomNumGen].yPos - (alienList[randomNumGen].size * alienList[randomNumGen].row) ;
+           }
+    
+   }
+    
+    function m_fireAlienBullet()
+    {
+        //if(this.showAlienBullet)
+            {
+                this.ay += this.aspeed;
+            
+            }
+        if(this.ay > canvas.height)
+            {
+                this.showAlienBullet = false;
+            }    
+    }
+    
+    function initAlienBullet()
+    {
+        for(var i = 0 ; i < totalNumOfBullets; i ++)
+            {
+                alienBulletArray[i] = new c_AlienBullets(alienBulletDesign, "cyan");
+            }
+    }
+    function drawAlienBullet()
+    {
+        //for(var i = 0 ; i < totalNumOfBullets; i ++)
+            {
+               if(alienBulletArray[randomNumGen].showAlienBullet == true)
+                   {
+                       alienBulletArray[randomNumGen].initAlienBulletGrid();
+                       
+                       
+                       
+                       
+                   }
+                
+            }
+    }      
+ 
+var AlienfireCounter = 0;
+var AlienbulletTimerCounter = 0;
+var AlienbulletFireGap = 10;
+var alienBulletcounter = 0
+    
+    function alienBulletFiring()
+    {
+        alienBulletcounter++;
+        if(alienBulletcounter == 150)
+            {
+                fireAlienBulletBool = true;
+                alienBulletcounter = 0;
+            }
+        for(var i = 0 ; i < totalNumOfBullets; i ++)
+            {
+                 //console.log(i);
+                if(fireAlienBulletBool == true)
+                    {
+                        alienBulletArray[i].ax = alienList[randomNumGen].xPos + (alienList[randomNumGen].size * alienList[randomNumGen].column)/2;
+                        alienBulletArray[i].ay = alienList[0].yPos + alienList[randomNumGen].yPos + (alienList[randomNumGen].size * alienList[randomNumGen].row) +2; 
+                         alienBulletArray[randomNumGen].resetAleinBullet();
+                        alienBulletArray[randomNumGen].showAlienBullet = true;
+                        fireAlienBulletBool = false;
+                    }
+                if(alienBulletArray[randomNumGen].showAlienBullet)
+                    {
+                         alienBulletArray[i].ax = alienList[randomNumGen].xPos + (alienList[randomNumGen].size * alienList[randomNumGen].column)/2;
+                       // alienBulletArray[i].ay = alienList[0].yPos + alienList[randomNumGen].yPos + (alienList[randomNumGen].size * alienList[randomNumGen].row) +2; 
+                        //alienBulletArray[19].ay += alienBulletArray[19].aspeed;
+                        alienBulletArray[randomNumGen].fireAlienBullet();
+                    }                
+                         
+                        
+            }
+    }
+    function destroyTankerGrid()
+    {
+            //if( tankerObj.showDestroyedGrid)
+                {
+                    //tankerObj.tankerGrid = [];
+                   //tankerObj.showTanker = false;
+                   
+                   tankerObj.showTankerDestroyedGrid = false;
+                }
+
+          
+    }
+    
+    function alienBulletCollideWithTanker()
+    {
+
+         for(var i = 0 ; i < totalNumOfBullets; i ++)
+         {
+            if(alienBulletArray[i].showAlienBullet == true)
+            {
+                if(alienBulletArray[i].ay > tankerObj.yCord  && 
+                      alienBulletArray[i].ay < tankerObj.yCord + (tankerObj.size * tankerObj.row))
+                {
+
+                    if(alienBulletArray[i].ax > tankerObj.xCord &&
+                       alienBulletArray[i].ax <tankerObj.xCord + (tankerObj.size * tankerObj.column) || 
+                      alienBulletArray[i].ax + (alienBulletArray[i].size * alienBulletArray[i].column) >tankerObj.xCord &&
+                       alienBulletArray[i].ax + (alienBulletArray[i].size * alienBulletArray[i].column) < tankerObj.xCord + (tankerObj.size * tankerObj.column))
+                        {
+                            console.log("tanker collided with alienbullet");
+                            tankerObj.collidedWithBullet = true;
+                            tankerObj.life--;
+                            tankerLifeArray.pop(); 
+                            console.log("Raj" + tankerLifeArray.length);
+                            tankerObj.showTankerDestroyedGrid = true;
+                            alienBulletArray[i].showAlienBullet = false;
+                            
+                            tankerExplosion();
+                            setTimeout(destroyTankerGrid, 500);
+                            if(tankerObj.life > 0)
+                                {
+                                    setTimeout(resetTanker,1000);
+                                }
+                            else
+                                {
+                                    tankerObj.showTanker = false;
+                                    tankerObj.life = 0
+                                   
+                                }
+                            
+
+                        }
+                    }
+                 }
+
+              }
+    }
+    function tankerExplosion()
+    {
+        if(tankerObj.showTankerDestroyedGrid)
+            {
+                tankerObj.tankerGrid = tankerDestroyGrid;
+                drawTanker();
+            }
+    }
+    
+    function alienBulletCollisionwithShield()
+{
+    for(var i = 0 ; i < alienBulletArray.length; i ++)
+    {  
+        for(var j = 0 ; j < shieldArray.length; j ++)
+        {
+            for(var k = 0 ; k < shieldArray[j].body.length; k ++) 
+            {
+                if(alienBulletArray[i].showAlienBullet && alienBulletArray[i].ay >= shieldArray[j].body[k].y
+                    && 
+                  alienBulletArray[i].ay < shieldArray[j].body[k].y + (shieldArray[j].body[k].size * shieldArray[j].body[k].rowSize) )
+                    {
+                        if(alienBulletArray[i].ax > shieldArray[j].body[k].x &&
+                        alienBulletArray[i].ax < shieldArray[j].body[k].x + (shieldArray[j].body[k].size * shieldArray[j].body[k].columnSize) || 
+                        alienBulletArray[i].ax + (alienBulletArray[i].size * alienBulletArray[i].column) > shieldArray[j].body[k].x &&
+                        alienBulletArray[i].ax + (alienBulletArray[i].size * alienBulletArray[i].column) < shieldArray[j].body[k].x + (shieldArray[j].body[k].size * shieldArray[j].body[k].columnSize))
+                            {
+                                
+                                if(shieldArray[j].body[k].grid == squareStep1 && shieldArray[j].body[k].collideCounterSq == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep2;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep2 && shieldArray[j].body[k].collideCounterSq == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep3;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep3 && shieldArray[j].body[k].collideCounterSq == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = squareStep4;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == squareStep4 && shieldArray[j].body[k].collideCounterSq == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                                shieldArray[j].body[k].collideCounterSq++;
+                                
+                                if(shieldArray[j].body[k].grid == triangle1Step1 && shieldArray[j].body[k].collideCounterTr1 == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step2;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step2 && shieldArray[j].body[k].collideCounterTr1 == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step3;
+                                      alienBulletArray[i].showAlienBullet= false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step3 && shieldArray[j].body[k].collideCounterTr1 == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle1Step4;
+                                     alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle1Step4 && shieldArray[j].body[k].collideCounterTr1 == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      alienBulletArray[i].showAlienBullet= false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                               shieldArray[j].body[k].collideCounterTr1++;
+                                
+                                if(shieldArray[j].body[k].grid == triangle2Step1 && shieldArray[j].body[k].collideCounterTr2 == 0)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step2;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step2 && shieldArray[j].body[k].collideCounterTr2 == 1)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step3;
+                                      alienBulletArray[i].showAlienBullet = false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step3 && shieldArray[j].body[k].collideCounterTr2 == 2)
+                                  {
+                                      shieldArray[j].body[k].grid = triangle2Step4;
+                                      alienBulletArray[i].showAlienBullet= false;
+                                      break;
+                                      break;
+                                      break;
+                                  }
+                                if(shieldArray[j].body[k].grid == triangle2Step4 && shieldArray[j].body[k].collideCounterTr2 == 3)
+                                  {
+                                      shieldArray[j].body[k].grid = [];
+                                      alienBulletArray[i].showAlienBullet= false;
+                                      break;
+                                      break;
+                                      break;
+                                      
+                                  }
+                               shieldArray[j].body[k].collideCounterTr2++;
+                                
+                                
+                            }
+                    }
+                }
+            }
+    }
+}
+
+
+    function drawingSurroundings()
+    {
+        var background = new Image();
+        background.src = './spaceImage.jpg';
+        ctx.drawImage(background,0,0,canvas.width,canvas.height);   
+
+    }
+    var showTankerLife = true;
+    function drawingTankerLife()
+    {
+        blinkCounter++;
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "red";
+        ctx.fillText("SpaceShip Life : ", 20, 30);
+         if(blinkCounter > 0 &&  blinkCounter < 10)
+            {
+                
+                showTankerLife = true;
+            }
+        if(blinkCounter2 >= 10 )
+            {
+                
+                showTankerLife = false;
+                blinkCounter = 0;
+            }
+        if(showTankerLife)
+            {
+                for(var i = 0 ; i < tankerLifeArray.length; i ++)
+                    {
+                        tankerLifeArray[i] = new c_tanker(180 + (i * 70), 5 , 0, 2, tankerDesign, "yellow");
+                        tankerLifeArray[i].initTanker();
+                    }
+            }
+        
+        
+        
+        //var tankerLifeObj = new c_tanker(50, 30, 0, 1, tankerDesign, "yellow");
+        //tankerLifeObj.initTanker();
+    }
+    
+    function showScoreOfTanker()
+    {
+        blinkCounter2++;
+        if(blinkCounter2 > 0 &&  blinkCounter2 < 10)
+            {
+                
+                showScore = true;
+            }
+        if(blinkCounter2 >= 10 )
+            {
+                
+                showScore = false;
+                blinkCounter2 = 0;
+            }
+        if(showScore)
+            {
+                ctx.font = "25px HEATHER";
+                ctx.fillStyle = "cyan"
+                ctx.fillText("SCORE : " + numOfALienCollided, 700, 30);
+            }
+        
+        
+    }
+    
+    function gameOver()
+{
+    
+    if(tankerObj.life == 0)
+        {
+            clearInterval(gameControl);
+        
+        ctx.globalAlpha = 1;
+        ctx.font = "bold 50px Courier New";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "green";
+        ctx.fillText("GAME OVER!",canvas.width/2,(canvas.height)/2 + 100);
+        }
+        
+    
+}
+    
+    function  winningScene()
+    {
+        clearInterval(gameControl);
+         ctx.globalAlpha = 1;
+        ctx.font = "bold 30px Courier New";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "green";
+        ctx.fillText("YOU saved the world from alien attack!",canvas.width/2,(canvas.height)/2 + 100);
+    }
+    
+    
+    function printAllText()
+{
+    /*ctx.fillStyle = "white"
+    ctx.font = "29px Pickwick";
+    ctx.fillText("The David's Fantasy World", 400, 50);*/
+    /*ctx.font = "20px Comic Sans Bold";
+    ctx.fillStyle = "red";
+    ctx.fillText("Use Up-arrow to Move Up", 50, 280);
+    
+    ctx.fillText("Use right-arrow to Move Right", 50, 300);
+    ctx.font = "20px Comic Sans";
+    ctx.fillText("Use Left-arrow to Move Left", 50, 320);
+    ctx.font = "20px Comic Sans";
+    ctx.fillText("Use Down-arrow to Move Down", 50, 340);*/
+    ctx.fillStyle = "cyan";
+    ctx.font = "25px calibri ";
+    ctx.fillText("Press ENTER to play the game", 460, 490);
+    ctx.fillStyle = "cyan";
+    //ctx.font = "15px calibri ";
+    //ctx.fillText("Power-Up strategies: ", 410, 10);
+    ctx.font = "20px calibri ";
+    ctx.fillStyle = "white";
+    ctx.fillText("Press Space-bar to shoot from your SpaceShip", 430, 400);
+    /*ctx.fillStyle = "green";
+    ctx.fillText("Grow Snake", 430, 100);
+    ctx.fillStyle = "red";
+    ctx.fillText("Shrinks snake", 430, 130);
+    ctx.fillStyle = "pink";
+    ctx.fillText("Speed DOWN snake", 430, 160);*/
+    
+    
+}
+function gameLoop()
+{
+    if(startscene)
+        {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            //ctx.fillStyle = "black";
+            //ctx.fillRect(0,0, canvas.width, canvas.height);
+            ctx.drawImage(bgimg,0,0, canvas.width, canvas.height);
+            //ctx.drawImage(controls,300,250, 70, 70);
+            
+            
+           
+            
+            printAllText();
+            ctx.drawImage(shootPic,20,450, 350, 250);
+            ctx.drawImage(logo,200,10, 450, 250);
+            ctx.drawImage(spaceship,480,620, 350, 250);
+            
+            //ctx.drawImage(blueCube,400,40, 20, 20);
+            //ctx.drawImage(greenCube,400,80, 20, 20);
+            //ctx.drawImage(redCube,400,110, 20, 20);
+            //ctx.drawImage(pinkCube,400,140, 20, 20);
+    
+        }
+        
+        
+    if(gamescene)
+        {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            drawingSurroundings();
+            //ctx.fillStyle = "black";
+            //ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            alienAnimator();
+            drawAliens();
+            drawTanker();
+            drawBullet();
+
+            drawAllShields();
+            bulletManager();
+            drawAlienBullet();
+              alienBulletFiring();
+            collisionDetection(); 
+            collision_With_Shield();
+            alienBulletCollideWithTanker();
+                setTimeout(gameOver, 1000);
+             drawingTankerLife();
+            alienBulletCollisionwithShield();
+            showScoreOfTanker();
+        }
+
+
+}
+
+initAliens();
+initTanker();       
+initBullet();
+initshields();
+initAlienBullet();
+  
+
+document.addEventListener("keydown", keyDownManager);
+document.addEventListener("keyup", keyUpManager);
+
+
+var gameControl = setInterval(gameLoop, 33.33);
+
+
+
+</script>
+</body>
+</html>
+
+        
+     
